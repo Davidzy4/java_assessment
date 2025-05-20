@@ -6,66 +6,100 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Student
-    extends Person
-    implements Evaluation
+public class Student extends Person implements Evaluation
 {
     private double average;
 
     private final List<Course> courses = new ArrayList<>();
-
     private final Map<String, Course> approvedCourses = new HashMap<>();
+    private final Map<String, Double> grades = new HashMap<>();
 
-    public Student( String id, String name, String email, Date birthDate )
+    public Student(String id, String name, String email, Date birthDate)
     {
-        super( id, name, email, birthDate );
+        super(id, name, email, birthDate);
     }
 
-    public void enrollToCourse( Course course )
-    {
-        //TODO implement this method
+    public List<Course> getCourses() {
+        return courses;
     }
 
-    public void registerApprovedCourse( Course course )
-    {
-        approvedCourses.put( course.getCode(), course );
+    public boolean enrollToCourse(Course course) {
+        if (courses.contains(course)) {
+            System.out.println("Already enrolled to this course.");
+            return false;
+        }
+        this.courses.add(course);
+        return true;
     }
 
-    public boolean isCourseApproved( String courseCode )
-    {
-        //TODO implement this method
+    public void registerApprovedCourse(Course course) {
+        approvedCourses.put(course.getCode(), course);
+    }
+
+    public boolean isCourseApproved(String courseCode) {
+        return approvedCourses.containsKey(courseCode);
+    }
+
+    public boolean isAttendingCourse(String courseCode) {
+        for (Course c : courses) {
+            if (c.getCode().equals(courseCode)) {
+                return true;
+            }
+        }
         return false;
     }
 
-    // CHALLENGE IMPLEMENTATION: Read README.md to find instructions on how to solve. 
-    public List<Course> findPassedCourses( Course course )
-    {
-        //TODO implement this method
-        return null;
+    public void setGrade(String courseCode, double score) {
+        grades.put(courseCode, score);
+        if (score >= 4.5 && isAttendingCourse(courseCode)) {
+            for (Course c : courses) {
+                if (c.getCode().equals(courseCode)) {
+                    registerApprovedCourse(c);
+                    break;
+                }
+            }
+        }
     }
 
-    public boolean isAttendingCourse( String courseCode )
-    {
-        //TODO implement this method
-        return false;
+    public Double getGrade(String courseCode) {
+        return grades.get(courseCode);
+    }
+
+    public List<Course> findPassedCourses(Course dummyInputToMatchSignature) {
+        List<Course> passed = new ArrayList<>();
+        for (String code : grades.keySet()) {
+            if (grades.get(code) >= 4.5) {
+                passed.add(approvedCourses.get(code));
+            }
+        }
+        return passed;
+    }
+
+    public int getTotalCredits() {
+        int total = 0;
+        for (Course course : getApprovedCourses()) {
+            total += course.getCredits(); // Assuming 9 for passed courses
+        }
+        return total;
     }
 
     @Override
-    public double getAverage()
-    {
-        return average;
+    public double getAverage() {
+        if (grades.isEmpty()) return 0.0;
+        double total = 0;
+        for (double score : grades.values()) {
+            total += score;
+        }
+        return total / grades.size();
     }
 
     @Override
-    public List<Course> getApprovedCourses()
-    {
-        //TODO implement this method
-        return null;
+    public List<Course> getApprovedCourses() {
+        return new ArrayList<>(approvedCourses.values());
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Student {" + super.toString() + "}";
     }
 }

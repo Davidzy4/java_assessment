@@ -43,6 +43,6 @@ abstract public class Person
     @Override
     public String toString()
     {
-        return id + '\'' + ", name='" + name + '\'' + ", email='" + email + '\'' + ", birthDate=" + birthDate;
+        return "ID='" + id + '\'' + ", name='" + name + '\'' + ", email='" + email + '\'' + ", birthDate=" + birthDate;
     }
 }
